@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>130fc106-0dca-462a-9e85-ce73e4429f61</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FileLoader">
+      <HintPath>..\..\Downloads\TestProjectFS\TestProject\Loaders\FileLoader\bin\Debug\netstandard2.0\FileLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="SqlServerLoader">
+      <HintPath>..\..\Downloads\TestProjectFS\TestProject\Loaders\SqlServerLoader\bin\Debug\netstandard2.0\SqlServerLoader.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
