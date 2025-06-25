@@ -15,8 +15,8 @@ namespace TestService
 				var loader = config["VendorSettings:Loader"];
 				return loader switch
 				{
-					"A" => new LoaderAService(config),
-					"B" => new LoaderBService(config),
+					"SqlServerLoader" => new Services.SqlServerLoader(config),
+					"FileLoader" => new Services.FileLoader(config),
 					_ => throw new Exception("Invalid loader config")
 				};
 			});
