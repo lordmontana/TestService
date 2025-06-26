@@ -1,5 +1,6 @@
-﻿using TestService.Models;
-using FileLoader;
+﻿using FileLoader;
+using TestService.Exceptions;
+using TestService.Models;
 
 namespace TestService.Services
 {
@@ -37,16 +38,24 @@ namespace TestService.Services
 		public Task<LoaderDTO> GetById(string id)
 		{
 			var loader = new Loader(_path);
-			var item = loader.LoadSupplier(id); 
-
-			var dto = item == null ? new LoaderDTO() : new LoaderDTO
+			try
 			{
-				Id = item.Id,
-				Name = item.Name,
-				Region = item.Address
-			};
+				var item = loader.LoadSupplier(id); // This will throw ApiException if not found
 
-			return Task.FromResult(dto);
+				var dto = new LoaderDTO
+				{
+					Id = item.Id,
+					Name = item.Name,
+					Region = item.Address
+				};
+
+				return Task.FromResult(dto);
+			}
+			catch (ApiException ex)
+			{
+				throw new CustomException(ex.Message, ex.StatusCode);
+			}
+
 		}
 
 		/// <inheritdoc/>
@@ -59,9 +68,17 @@ namespace TestService.Services
 				Name = supplier.Name,
 				Address = supplier.Region
 			};
-			loader.InsertSupplier(supplierToInsert);
 
-			return Task.CompletedTask;
+			try
+			{
+				loader.InsertSupplier(supplierToInsert);
+				return Task.CompletedTask;
+			}
+			catch (ApiException ex)
+			{
+				// Wrap library exception to unified exception
+				throw new CustomException(ex.Message, ex.StatusCode);
+			}
 		}
 
 		/// <inheritdoc/>
@@ -74,18 +91,34 @@ namespace TestService.Services
 				Name = supplier.Name,
 				Address = supplier.Region
 			};
-			loader.UpdateSupplier(supplierToUpdate);
 
-			return Task.CompletedTask;
+			try
+			{
+				loader.UpdateSupplier(supplierToUpdate);
+				return Task.CompletedTask;
+			}
+			catch (ApiException ex)
+			{
+				throw new CustomException(ex.Message, ex.StatusCode);
+			}
 		}
+
 
 		/// <inheritdoc/>
 		public Task Delete(string id)
 		{
 			var loader = new Loader(_path);
-			loader.DeleteSupplier(id);
 
-			return Task.CompletedTask;
+			try
+			{
+				loader.DeleteSupplier(id);
+				return Task.CompletedTask;
+			}
+			catch (ApiException ex)
+			{
+				throw new CustomException(ex.Message, ex.StatusCode);
+			}
 		}
+
 	}
 }

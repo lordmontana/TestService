@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TestService.Exceptions;
 using TestService.Models;
 using TestService.Services;
 
@@ -24,8 +25,16 @@ namespace TestService.Controllers
 		[HttpGet]
 		public async Task<ActionResult<List<LoaderDTO>>> GetAll()
 		{
-			var result = await _vendorService.GetAll();
-			return Ok(result);
+			try
+			{
+				var result = await _vendorService.GetAll();
+				return Ok(result);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Unexpected error in GetAll");
+				return StatusCode(500, "Internal server error.");
+			}
 		}
 
 		/// <summary>
@@ -36,9 +45,30 @@ namespace TestService.Controllers
 		[HttpGet("{id}")]
 		public async Task<ActionResult<LoaderDTO>> GetById(string id)
 		{
-			var result = await _vendorService.GetById(id);
-			return result == null ? NotFound() : Ok(result);
+			try
+			{
+				var result = await _vendorService.GetById(id);
+
+				if (result == null)
+					return NotFound();
+
+				return Ok(result);
+			}
+			catch (CustomException ex)
+			{
+				return NotFound(new
+				{
+					message = ex.Message,
+					code = ex.ErrorCode
+				});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Unexpected error in GetById");
+				return StatusCode(500, "Internal server error.");
+			}
 		}
+
 
 		/// <summary>
 		/// Adds a new vendor to the configured data source.
@@ -48,8 +78,25 @@ namespace TestService.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Add([FromBody] LoaderDTO vendor)
 		{
-			await _vendorService.Add(vendor);
-			return CreatedAtAction(nameof(GetById), new { id = vendor.Id }, vendor);
+			try
+			{
+				await _vendorService.Add(vendor);
+				return CreatedAtAction(nameof(GetById), new { id = vendor.Id }, vendor);
+			}
+			catch (CustomException ex)
+			{
+
+				return BadRequest(new
+				{
+					message = ex.Message,
+					code = ex.ErrorCode
+				});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Unexpected error in Add");
+				return StatusCode(500, "Internal server error.");
+			}
 		}
 
 		/// <summary>
@@ -58,12 +105,29 @@ namespace TestService.Controllers
 		/// <param name="id">The ID of the vendor to update.</param>
 		/// <param name="vendor">The updated vendor data.</param>
 		/// <returns>A 204 No Content response on success.</returns>
-		[HttpPut("{id}")]
-		public async Task<IActionResult> Update(string id, [FromBody] LoaderDTO vendor)
+		[HttpPut]
+		public async Task<IActionResult> Update([FromBody] LoaderDTO vendor)
 		{
-			await _vendorService.Update(vendor);
-			return NoContent();
+			try
+			{
+				await _vendorService.Update(vendor);
+				return NoContent();
+			}
+			catch (CustomException ex)
+			{
+				return BadRequest(new
+				{
+					message = ex.Message,
+					code = ex.ErrorCode
+				});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Unexpected error in Update");
+				return StatusCode(500, "Internal server error.");
+			}
 		}
+
 
 		/// <summary>
 		/// Deletes a vendor by ID.
@@ -73,8 +137,24 @@ namespace TestService.Controllers
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(string id)
 		{
-			await _vendorService.Delete(id);
-			return NoContent();
+			try
+			{
+				await _vendorService.Delete(id);
+				return NoContent();
+			}
+			catch (CustomException ex)
+			{
+				return BadRequest(new
+				{
+					message = ex.Message,
+					code = ex.ErrorCode
+				});
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Unexpected error in Delete");
+				return StatusCode(500, "Internal server error.");
+			}
 		}
 	}
 }

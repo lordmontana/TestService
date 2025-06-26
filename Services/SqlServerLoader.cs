@@ -1,5 +1,6 @@
 ﻿using FileLoader;
 using SqlServerLoader;
+using TestService.Exceptions;
 using TestService.Models;
 
 namespace TestService.Services
@@ -39,14 +40,22 @@ namespace TestService.Services
 		public async Task<LoaderDTO> GetById(string id)
 		{
 			var loader = new DataLoader(_server, _userId, _password);
-			var item = await loader.LoadTrader(id);
 
-			return new LoaderDTO
+			try
 			{
-				Id = item.Code,
-				Name = item.Description,
-				Region = item.Street
-			};
+				var trader = await loader.LoadTrader(id);
+
+				return new LoaderDTO
+				{
+					Id = trader.Code,
+					Name = trader.Description,
+					Region = trader.Street
+				};
+			}
+			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			{
+				throw new CustomException("Supplier not found");
+			}
 		}
 
 		/// <inheritdoc/>
@@ -59,8 +68,18 @@ namespace TestService.Services
 				Description = supplier.Name,
 				Street = supplier.Region
 			};
-			loader.InsertTrader(trader);
-			return Task.CompletedTask;
+
+			try
+			{
+				loader.InsertTrader(trader);
+				return Task.CompletedTask;
+			}
+			catch (Exception ex) when (
+				ex.Message.Contains("Code and description are required") ||
+				ex.Message.Contains("Trader already exists"))
+			{
+				throw new CustomException(ex.Message);
+			}
 		}
 
 		/// <inheritdoc/>
@@ -73,16 +92,34 @@ namespace TestService.Services
 				Description = supplier.Name,
 				Street = supplier.Region
 			};
-			loader.UpdateTrader(traderToUpdate);
-			return Task.CompletedTask;
+
+			try
+			{
+				loader.UpdateTrader(traderToUpdate);
+				return Task.CompletedTask;
+			}
+			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			{
+				throw new CustomException(ex.Message);
+			}
 		}
+
 
 		/// <inheritdoc/>
 		public Task Delete(string id)
 		{
 			var loader = new DataLoader(_server, _userId, _password);
-			loader.DeleteTrader(id);
-			return Task.CompletedTask;
+
+			try
+			{
+				loader.DeleteTrader(id);
+				return Task.CompletedTask;
+			}
+			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			{
+				throw new CustomException(ex.Message);
+			}
 		}
+
 	}
 }
