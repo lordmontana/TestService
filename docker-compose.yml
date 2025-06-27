@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+
+# run at  http://localhost:5001/swagger/index.html
+  testservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: testservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    ports:
+      - "5001:80"
+    networks:
+      - testservice-network
+
+networks:
+  testservice-network:
+    driver: bridge

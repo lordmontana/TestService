@@ -1,5 +1,4 @@
-﻿using FileLoader;
-using SqlServerLoader;
+﻿using SqlServerLoader;
 using TestService.Exceptions;
 using TestService.Models;
 
@@ -26,14 +25,23 @@ namespace TestService.Services
 		public async Task<List<LoaderDTO>> GetAll()
 		{
 			var loader = new DataLoader(_server, _userId, _password);
-			var traders = await loader.LoadTraders();
-
-			return traders.Select(t => new LoaderDTO
+			try
 			{
-				Id = t.Code,
-				Name = t.Description,
-				Region = t.Street
-			}).ToList();
+				var traders = await loader.LoadTraders();
+
+				return traders.Select(t => new LoaderDTO
+				{
+					Id = t.Code,
+					Name = t.Description,
+					Region = t.Street
+				}).ToList();
+			}
+			catch (Exception ex) when (ex.Message.Contains("Wrong connection info"))
+			{
+
+				throw new CustomException("Wrong connection info");
+			}
+
 		}
 
 		/// <inheritdoc/>
@@ -52,7 +60,9 @@ namespace TestService.Services
 					Region = trader.Street
 				};
 			}
-			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			catch (Exception ex) when (
+			ex.Message.Contains("Trader not found") || 
+			ex.Message.Contains("Wrong connection info"))
 			{
 				throw new CustomException("Supplier not found");
 			}
@@ -76,7 +86,9 @@ namespace TestService.Services
 			}
 			catch (Exception ex) when (
 				ex.Message.Contains("Code and description are required") ||
-				ex.Message.Contains("Trader already exists"))
+				ex.Message.Contains("Trader already exists") ||
+				ex.Message.Contains("Wrong connection info"))
+
 			{
 				throw new CustomException(ex.Message);
 			}
@@ -98,7 +110,9 @@ namespace TestService.Services
 				loader.UpdateTrader(traderToUpdate);
 				return Task.CompletedTask;
 			}
-			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			catch (Exception ex) when (
+			ex.Message.Contains("Trader not found")||
+			ex.Message.Contains("Wrong connection info"))                       
 			{
 				throw new CustomException(ex.Message);
 			}
@@ -115,7 +129,9 @@ namespace TestService.Services
 				loader.DeleteTrader(id);
 				return Task.CompletedTask;
 			}
-			catch (Exception ex) when (ex.Message.Contains("Trader not found"))
+			catch (Exception ex) when (
+			ex.Message.Contains("Trader not found")||
+			ex.Message.Contains("Wrong connection info"))
 			{
 				throw new CustomException(ex.Message);
 			}
