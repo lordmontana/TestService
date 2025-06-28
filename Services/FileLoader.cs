@@ -40,7 +40,7 @@ namespace TestService.Services
 			var loader = new Loader(_path);
 			try
 			{
-				var item = loader.LoadSupplier(id); // This will throw ApiException if not found
+				var item = loader.LoadSupplier(id); 
 
 				var dto = new LoaderDTO
 				{
@@ -76,7 +76,6 @@ namespace TestService.Services
 			}
 			catch (ApiException ex)
 			{
-				// Wrap library exception to unified exception
 				throw new CustomException(ex.Message, ex.StatusCode);
 			}
 		}

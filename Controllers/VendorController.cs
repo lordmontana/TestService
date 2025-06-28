@@ -102,7 +102,6 @@ namespace TestService.Controllers
 		/// <summary>
 		/// Updates an existing vendor by ID.
 		/// </summary>
-		/// <param name="id">The ID of the vendor to update.</param>
 		/// <param name="vendor">The updated vendor data.</param>
 		/// <returns>A 204 No Content response on success.</returns>
 		[HttpPut]

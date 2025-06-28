@@ -21,6 +21,22 @@ namespace TestService
 				};
 			});
 
+
+			// Add CORS policy 
+			// allowing requests from the React frontend running on localhost:5173
+			// needs to be configured for production/localhost as well
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowFrontend", policy =>
+				{
+					policy
+						.WithOrigins("http://localhost:5173") // React dev server
+						.AllowAnyHeader()
+						.AllowAnyMethod();
+				});
+			});
+
+
 			builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -32,10 +48,12 @@ namespace TestService
 
 			var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-          //  if (app.Environment.IsDevelopment())
-           // {
-                app.UseSwagger();
+			app.UseCors("AllowFrontend");
+
+			// Configure the HTTP request pipeline.
+			//  if (app.Environment.IsDevelopment())
+			// {
+			app.UseSwagger();
                 app.UseSwaggerUI();
           //  }
 
