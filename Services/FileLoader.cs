@@ -1,6 +1,7 @@
 ﻿using FileLoader;
 using TestService.Exceptions;
 using TestService.Models;
+using TestService.Services.Interfaces;
 
 namespace TestService.Services
 {

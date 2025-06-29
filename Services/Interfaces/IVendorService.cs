@@ -1,4 +1,4 @@
-﻿namespace TestService.Services
+﻿namespace TestService.Services.Interfaces
 {
 	using TestService.Models;
 

@@ -1,5 +1,4 @@
-
-using TestService.Services;
+using TestService.Services.Interfaces;
 
 namespace TestService
 {
