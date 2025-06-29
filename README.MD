@@ -15,7 +15,7 @@ This starts the backend API (and any other services defined) using Docker contai
 
  The backend will be accessible at:
 
-http://localhost:5001 (or whatever port you've exposed in your docker-compose.yml)
+http://localhost:5001 
 
 4. Stop the containers
 docker-compose down
